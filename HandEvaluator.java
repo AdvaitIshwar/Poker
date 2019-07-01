@@ -19,8 +19,8 @@ public class HandEvaluator {
 
 	public static int hasPair(ArrayList<Card> table, Player p1) {
 		ArrayList<Card> player = p1.getHand();
-		if(hasThreeOfAKind(table, p1) == SET || hasTwoPair(table, p1) == TWOPAIR ||
-				hasFullHouse(table, p1) == FULLHOUSE || hasFourOfAKind(table, p1) == QUADS) {
+		if (hasThreeOfAKind(table, p1) == SET || hasTwoPair(table, p1) == TWOPAIR
+				|| hasFullHouse(table, p1) == FULLHOUSE || hasFourOfAKind(table, p1) == QUADS) {
 			return NOTHING;
 		}
 		fiveCardHand.clear();
@@ -29,21 +29,21 @@ public class HandEvaluator {
 		allCards.addAll(table);
 		Collections.sort(allCards, new CardCompare());
 		boolean hasPair = false;
-		for(int i=0; i<allCards.size()-1; i++) {
-			if(allCards.get(i).getValue()==allCards.get(i+1).getValue()) {
+		for (int i = 0; i < allCards.size() - 1; i++) {
+			if (allCards.get(i).getValue() == allCards.get(i + 1).getValue()) {
 				fiveCardHand.add(allCards.get(i));
-				fiveCardHand.add(allCards.get(i+1));
+				fiveCardHand.add(allCards.get(i + 1));
 				allCards.remove(i);
-				allCards.remove(i+1);
+				allCards.remove(i + 1 - 1);
 				hasPair = true;
 				break;
 			}
 		}
-		if(hasPair == true) {
-			fiveCardHand.add(allCards.get(allCards.size()-1));
-			fiveCardHand.add(allCards.get(allCards.size()-2));
-			fiveCardHand.add(allCards.get(allCards.size()-3));
-			//Pair first then next 3 best cards
+		if (hasPair == true) {
+			fiveCardHand.add(allCards.get(allCards.size() - 1));
+			fiveCardHand.add(allCards.get(allCards.size() - 2));
+			fiveCardHand.add(allCards.get(allCards.size() - 3));
+			// Pair first then next 3 best cards
 			p1.setFiveCardHand(fiveCardHand);
 			return PAIR;
 		} else {
@@ -67,35 +67,51 @@ public class HandEvaluator {
 		allCards.addAll(player);
 		allCards.addAll(table);
 		Collections.sort(allCards, new CardCompare());
+		boolean hasPair = false;
 		boolean hasTwoPair = false;
-		for(int i=0; i<allCards.size()-2; i++) {
-			if(allCards.get(i).getValue()==allCards.get(i+1).getValue()) {
-				for(int j=i+1; j<allCards.size()-1; j++) {
-					if(allCards.get(j).getValue()==allCards.get(j+1).getValue()) {
-						fiveCardHand.add(allCards.get(i));
-						fiveCardHand.add(allCards.get(i+1));
-						fiveCardHand.add(allCards.get(j));
-						fiveCardHand.add(allCards.get(j+1));
-						allCards.remove(i);
-						allCards.remove(i+1);
-						allCards.remove(j);
-						allCards.remove(j+1);
-						hasTwoPair = true;
-						break;
-					}
-				}
-				if(hasTwoPair == true) {
+		ArrayList<Card> temp = new ArrayList<Card>();
+		for (int i = 0; i < allCards.size() - 2; i++) {
+			if (allCards.get(i).getValue() == allCards.get(i + 1).getValue()) {
+				fiveCardHand.add(allCards.get(i));
+				fiveCardHand.add(allCards.get(i + 1));
+				temp.add(allCards.get(i));
+				temp.add(allCards.get(i + 1));
+				allCards.remove(i);
+				allCards.remove(i + 1 - 1);
+				hasPair = true;
+				break;
+			}
+		}
+		if(hasPair == true) {
+			for (int j = 0; j < allCards.size() - 1; j++) {
+				if (allCards.get(j).getValue() == allCards.get(j + 1).getValue()) {
+					fiveCardHand.add(allCards.get(j));
+					fiveCardHand.add(allCards.get(j + 1));
+					allCards.remove(j);
+					allCards.remove(j + 1 - 1);
+					hasTwoPair = true;
 					break;
 				}
 			}
 		}
-		if(hasTwoPair == true) {
+		if (hasTwoPair == true) {
 			Collections.sort(fiveCardHand, new CardCompare());
 			Collections.reverse(fiveCardHand);
-			fiveCardHand.add(allCards.get(allCards.size()-1));
-			//Higher pair first, then other pair then best card
+			fiveCardHand.add(allCards.get(allCards.size() - 1));
+			// Higher pair first, then other pair then best card
 			p1.setFiveCardHand(fiveCardHand);
 			return TWOPAIR;
+		} else if (hasPair == true && hasTwoPair == false) {
+			allCards.addAll(temp);
+			Collections.sort(allCards, new CardCompare());
+			fiveCardHand.clear();
+			fiveCardHand.add(allCards.get(6));
+			fiveCardHand.add(allCards.get(5));
+			fiveCardHand.add(allCards.get(4));
+			fiveCardHand.add(allCards.get(3));
+			fiveCardHand.add(allCards.get(2));
+			p1.setFiveCardHand(fiveCardHand);
+			return NOTHING;
 		} else {
 			fiveCardHand.add(allCards.get(6));
 			fiveCardHand.add(allCards.get(5));
@@ -118,23 +134,23 @@ public class HandEvaluator {
 		allCards.addAll(table);
 		Collections.sort(allCards, new CardCompare());
 		boolean hasSet = false;
-		for(int i=0; i<allCards.size()-2; i++) {
-			if(allCards.get(i).getValue()==allCards.get(i+1).getValue() &&
-					allCards.get(i).getValue()==allCards.get(i+2).getValue()) {
+		for (int i = 0; i < allCards.size() - 2; i++) {
+			if (allCards.get(i).getValue() == allCards.get(i + 1).getValue()
+					&& allCards.get(i).getValue() == allCards.get(i + 2).getValue()) {
 				fiveCardHand.add(allCards.get(i));
-				fiveCardHand.add(allCards.get(i+1));
-				fiveCardHand.add(allCards.get(i+2));
+				fiveCardHand.add(allCards.get(i + 1));
+				fiveCardHand.add(allCards.get(i + 2));
 				allCards.remove(i);
-				allCards.remove(i+1);
-				allCards.remove(i+2);
+				allCards.remove(i + 1 - 1);
+				allCards.remove(i + 2 - 2);
 				hasSet = true;
 				break;
 			}
 		}
-		if(hasSet == true) {
-			fiveCardHand.add(allCards.get(allCards.size()-1));
-			fiveCardHand.add(allCards.get(allCards.size()-2));
-			//Set first then 2 best cards
+		if (hasSet == true) {
+			fiveCardHand.add(allCards.get(allCards.size() - 1));
+			fiveCardHand.add(allCards.get(allCards.size() - 2));
+			// Set first then 2 best cards
 			p1.setFiveCardHand(fiveCardHand);
 			return TWOPAIR;
 		} else {
@@ -150,18 +166,15 @@ public class HandEvaluator {
 
 	public static int hasStraight(ArrayList<Card> table, Player p1) {
 		ArrayList<Card> player = p1.getHand();
-		if (hasStraightFlush(table, p1) == STRAIGHTFLUSH) {
-			return NOTHING;
-		}
 		// Checks straight with both cards in player's hand
 		ArrayList<Card> allCards = new ArrayList<Card>();
-		allCards.add(player.get(0));
-		allCards.add(player.get(1));
-		Collections.sort(table, new CardCompare());
-		boolean hasStraight = straightHelper(table);
+		allCards.addAll(player);
+		allCards.addAll(table);
+		Collections.sort(allCards, new CardCompare());
+		boolean hasStraight = straightHelper(allCards);
 		if (hasStraight == true) {
 			Collections.reverse(straightHand);
-			//Puts straight hand in decending order of rank
+			// Puts straight hand in decending order of rank
 			p1.setFiveCardHand(fiveCardHand);
 			return STRAIGHT;
 		} else {
@@ -175,7 +188,8 @@ public class HandEvaluator {
 		}
 	}
 
-	//Pre-condition: Parameter must be sorted array containing cards on the board and player
+	// Pre-condition: Parameter must be sorted array containing cards on the board
+	// and player
 	public static boolean straightHelper(ArrayList<Card> hand) {
 		straightHand.clear();
 		if (hand.get(0).getValue() + 1 == hand.get(1).getValue() && hand.get(0).getValue() + 2 == hand.get(2).getValue()
@@ -210,15 +224,12 @@ public class HandEvaluator {
 		} else {
 			return false;
 		}
-		//straightHand stores cards in straight order from lowest rank to highest rank
-		//Ex 2 in a straight would be stored at index 0 and 6 at index 4
+		// straightHand stores cards in straight order from lowest rank to highest rank
+		// Ex 2 in a straight would be stored at index 0 and 6 at index 4
 	}
 
 	public static int hasFlush(ArrayList<Card> table, Player p1) {
 		ArrayList<Card> player = p1.getHand();
-		if (hasStraightFlush(table, p1) == STRAIGHTFLUSH) {
-			return NOTHING;
-		}
 		ArrayList<Card> allCards = new ArrayList<Card>();
 		allCards.addAll(player);
 		allCards.addAll(table);
@@ -270,14 +281,14 @@ public class HandEvaluator {
 			}
 		}
 		Collections.sort(flushCards, new CardCompare());
-		flushHand.add(flushCards.get(flushCards.size()-1));
-		flushHand.add(flushCards.get(flushCards.size()-2));
-		flushHand.add(flushCards.get(flushCards.size()-3));
-		flushHand.add(flushCards.get(flushCards.size()-4));
-		flushHand.add(flushCards.get(flushCards.size()-5));
+		flushHand.add(flushCards.get(flushCards.size() - 1));
+		flushHand.add(flushCards.get(flushCards.size() - 2));
+		flushHand.add(flushCards.get(flushCards.size() - 3));
+		flushHand.add(flushCards.get(flushCards.size() - 4));
+		flushHand.add(flushCards.get(flushCards.size() - 5));
 		p1.setFiveCardHand(flushHand);
-		//flushHand stores best flush hand in order of greatest card rank to lowest
-		//Ex Ace in flush will be stored at index 0 and 2 at index 4
+		// flushHand stores best flush hand in order of greatest card rank to lowest
+		// Ex Ace in flush will be stored at index 0 and 2 at index 4
 	}
 
 	public static int hasFullHouse(ArrayList<Card> table, Player p1) {
@@ -287,35 +298,52 @@ public class HandEvaluator {
 		allCards.addAll(player);
 		allCards.addAll(table);
 		Collections.sort(allCards, new CardCompare());
+		boolean hasSet = false;
 		boolean hasFullHouse = false;
-		for(int i=0; i<allCards.size()-2; i++) {
-			if(allCards.get(i).getValue()==allCards.get(i+1).getValue() &&
-					allCards.get(i).getValue()==allCards.get(i+2).getValue()) {
-				for(int j=i+1; j<allCards.size()-1; j++) {
-					if(allCards.get(j).getValue() == allCards.get(j+1).getValue()) {
-						fiveCardHand.add(allCards.get(i));
-						fiveCardHand.add(allCards.get(i+1));
-						fiveCardHand.add(allCards.get(i+2));
-						fiveCardHand.add(allCards.get(j));
-						fiveCardHand.add(allCards.get(j+1));
-						allCards.remove(i);
-						allCards.remove(i+1);
-						allCards.remove(i+2);
-						allCards.remove(j);
-						allCards.remove(j+1);
-						hasFullHouse = true;
-						break;
-					}
-				}
-				if(hasFullHouse == true) {
+		ArrayList<Card> temp = new ArrayList<Card>();
+		for (int i = 0; i < allCards.size() - 2; i++) {
+			if (allCards.get(i).getValue() == allCards.get(i + 1).getValue()
+					&& allCards.get(i).getValue() == allCards.get(i + 2).getValue()) {
+				fiveCardHand.add(allCards.get(i));
+				fiveCardHand.add(allCards.get(i + 1));
+				fiveCardHand.add(allCards.get(i + 2));
+				temp.add(allCards.get(i));
+				temp.add(allCards.get(i + 1));
+				temp.add(allCards.get(i + 2));
+				allCards.remove(i);
+				allCards.remove(i + 1 - 1);
+				allCards.remove(i + 2 - 2);
+				hasSet = true;
+				break;
+			}
+		}
+		if (hasSet == true) {
+			for (int j = 0; j < allCards.size() - 1; j++) {
+				if (allCards.get(j).getValue() == allCards.get(j + 1).getValue()) {
+					fiveCardHand.add(allCards.get(j));
+					fiveCardHand.add(allCards.get(j + 1));
+					allCards.remove(j);
+					allCards.remove(j + 1 - 1);
+					hasFullHouse = true;
 					break;
 				}
 			}
 		}
-		if(hasFullHouse == true) {
+		if (hasFullHouse == true) {
 			p1.setFiveCardHand(fiveCardHand);
-			//Set first then pair
+			// Set first then pair
 			return FULLHOUSE;
+		} else if (hasSet == true && hasFullHouse == false) {
+			allCards.addAll(temp);
+			Collections.sort(allCards, new CardCompare());
+			fiveCardHand.clear();
+			fiveCardHand.add(allCards.get(6));
+			fiveCardHand.add(allCards.get(5));
+			fiveCardHand.add(allCards.get(4));
+			fiveCardHand.add(allCards.get(3));
+			fiveCardHand.add(allCards.get(2));
+			p1.setFiveCardHand(fiveCardHand);
+			return NOTHING;
 		} else {
 			fiveCardHand.add(allCards.get(6));
 			fiveCardHand.add(allCards.get(5));
@@ -335,26 +363,26 @@ public class HandEvaluator {
 		allCards.addAll(table);
 		Collections.sort(allCards, new CardCompare());
 		boolean hasQuads = false;
-		for(int i=0; i<allCards.size()-3; i++) {
-			if(allCards.get(i).getValue()==allCards.get(i+1).getValue() &&
-					allCards.get(i).getValue()==allCards.get(i+2).getValue() &&
-					allCards.get(i).getValue()==allCards.get(i+3).getValue()) {
+		for (int i = 0; i < allCards.size() - 3; i++) {
+			if (allCards.get(i).getValue() == allCards.get(i + 1).getValue()
+					&& allCards.get(i).getValue() == allCards.get(i + 2).getValue()
+					&& allCards.get(i).getValue() == allCards.get(i + 3).getValue()) {
 				fiveCardHand.add(allCards.get(i));
-				fiveCardHand.add(allCards.get(i+1));
-				fiveCardHand.add(allCards.get(i+2));
-				fiveCardHand.add(allCards.get(i+3));
+				fiveCardHand.add(allCards.get(i + 1));
+				fiveCardHand.add(allCards.get(i + 2));
+				fiveCardHand.add(allCards.get(i + 3));
 				allCards.remove(i);
-				allCards.remove(i+1);
-				allCards.remove(i+2);
-				allCards.remove(i+3);
+				allCards.remove(i + 1 - 1);
+				allCards.remove(i + 2 - 2);
+				allCards.remove(i + 3 - 3);
 				hasQuads = true;
 				break;
 			}
 		}
-		if(hasQuads == true) {
-			fiveCardHand.add(allCards.get(allCards.size()-1));
+		if (hasQuads == true) {
+			fiveCardHand.add(allCards.get(allCards.size() - 1));
 			p1.setFiveCardHand(fiveCardHand);
-			//Quads first then best card
+			// Quads first then best card
 			return QUADS;
 		} else {
 			fiveCardHand.add(allCards.get(6));
@@ -380,12 +408,15 @@ public class HandEvaluator {
 			return NOTHING;
 		}
 	}
+
 	public static ArrayList<Card> getFlushHand() {
 		return flushHand;
 	}
+
 	public static ArrayList<Card> getStraightHand() {
 		return straightHand;
 	}
+
 	public static ArrayList<Card> getFiveCardHand() {
 		return fiveCardHand;
 	}
