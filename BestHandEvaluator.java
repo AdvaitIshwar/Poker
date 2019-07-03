@@ -63,17 +63,17 @@ public class BestHandEvaluator {
 			for(int j=0; j<sameRank.size(); j++) {
 				if(i!=j) {
 					ArrayList<Card> playerOne = sameRank.get(i).getFiveCardHand();
-					ArrayList<Card> playerTwo = sameRank.get(i+1).getFiveCardHand();
+					ArrayList<Card> playerTwo = sameRank.get(j).getFiveCardHand();
 					if(playerOne.get(0).getValue() == playerTwo.get(0).getValue()) {
 						if(playerOne.get(4).getValue() > playerTwo.get(4).getValue()) {
-							winnerCopy.remove(sameRank.get(i+1));
+							winnerCopy.remove(sameRank.get(j));
 						} else if(playerOne.get(4).getValue() < playerTwo.get(4).getValue()) {
 							winnerCopy.remove(sameRank.get(i));
 						} else {
 							continue;
 						}
 					} else if(playerOne.get(0).getValue() > playerTwo.get(0).getValue()) {
-						winnerCopy.remove(sameRank.get(i+1));
+						winnerCopy.remove(sameRank.get(j));
 					} else {
 						winnerCopy.remove(sameRank.get(i));
 					}

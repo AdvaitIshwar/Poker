@@ -13,11 +13,15 @@ public class HandEvaluator {
 	final static int FULLHOUSE = 6;
 	final static int QUADS = 7;
 	final static int STRAIGHTFLUSH = 8;
-	public static ArrayList<Card> straightHand = new ArrayList<Card>();
-	public static ArrayList<Card> flushHand = new ArrayList<Card>();
-	public static ArrayList<Card> fiveCardHand = new ArrayList<Card>();
-
-	public static int hasPair(ArrayList<Card> table, Player p1) {
+	public boolean hasAce;
+	public ArrayList<Card> straightHand = new ArrayList<Card>();
+	public ArrayList<Card> flushHand = new ArrayList<Card>();
+	public ArrayList<Card> fiveCardHand = new ArrayList<Card>();
+	
+	public HandEvaluator() {
+		hasAce = false;
+	}
+	public int hasPair(ArrayList<Card> table, Player p1) {
 		ArrayList<Card> player = p1.getHand();
 		if (hasThreeOfAKind(table, p1) == SET || hasTwoPair(table, p1) == TWOPAIR
 				|| hasFullHouse(table, p1) == FULLHOUSE || hasFourOfAKind(table, p1) == QUADS) {
@@ -57,7 +61,7 @@ public class HandEvaluator {
 		}
 	}
 
-	public static int hasTwoPair(ArrayList<Card> table, Player p1) {
+	public int hasTwoPair(ArrayList<Card> table, Player p1) {
 		ArrayList<Card> player = p1.getHand();
 		if (hasFullHouse(table, p1) == FULLHOUSE || hasFourOfAKind(table, p1) == QUADS) {
 			return NOTHING;
@@ -123,7 +127,7 @@ public class HandEvaluator {
 		}
 	}
 
-	public static int hasThreeOfAKind(ArrayList<Card> table, Player p1) {
+	public int hasThreeOfAKind(ArrayList<Card> table, Player p1) {
 		ArrayList<Card> player = p1.getHand();
 		if (hasFullHouse(table, p1) == FULLHOUSE || hasFourOfAKind(table, p1) == QUADS) {
 			return NOTHING;
@@ -152,7 +156,7 @@ public class HandEvaluator {
 			fiveCardHand.add(allCards.get(allCards.size() - 2));
 			// Set first then 2 best cards
 			p1.setFiveCardHand(fiveCardHand);
-			return TWOPAIR;
+			return SET;
 		} else {
 			fiveCardHand.add(allCards.get(6));
 			fiveCardHand.add(allCards.get(5));
@@ -164,7 +168,7 @@ public class HandEvaluator {
 		}
 	}
 
-	public static int hasStraight(ArrayList<Card> table, Player p1) {
+	public int hasStraight(ArrayList<Card> table, Player p1) {
 		ArrayList<Card> player = p1.getHand();
 		// Checks straight with both cards in player's hand
 		ArrayList<Card> allCards = new ArrayList<Card>();
@@ -172,10 +176,14 @@ public class HandEvaluator {
 		allCards.addAll(table);
 		Collections.sort(allCards, new CardCompare());
 		boolean hasStraight = straightHelper(allCards);
-		if (hasStraight == true) {
+		if (hasStraight == true && hasAce == false) {
 			Collections.reverse(straightHand);
 			// Puts straight hand in decending order of rank
-			p1.setFiveCardHand(fiveCardHand);
+			p1.setFiveCardHand(straightHand);
+			return STRAIGHT;
+		} else if(hasStraight == true && hasAce == true) {
+			//Hardcoded Ace case
+			p1.setFiveCardHand(straightHand);
 			return STRAIGHT;
 		} else {
 			straightHand.add(allCards.get(6));
@@ -190,7 +198,7 @@ public class HandEvaluator {
 
 	// Pre-condition: Parameter must be sorted array containing cards on the board
 	// and player
-	public static boolean straightHelper(ArrayList<Card> hand) {
+	public boolean straightHelper(ArrayList<Card> hand) {
 		straightHand.clear();
 		if (hand.get(0).getValue() + 1 == hand.get(1).getValue() && hand.get(0).getValue() + 2 == hand.get(2).getValue()
 				&& hand.get(0).getValue() + 3 == hand.get(3).getValue()
@@ -221,6 +229,19 @@ public class HandEvaluator {
 			straightHand.add(hand.get(5));
 			straightHand.add(hand.get(6));
 			return true;
+		} else if(hand.get(6).getValue()==13) {
+			if(hand.get(0).getValue()==1 && hand.get(1).getValue()==2 && hand.get(2).getValue()==3 
+					&& hand.get(3).getValue()==4) {
+				straightHand.add(hand.get(3));
+				straightHand.add(hand.get(2));
+				straightHand.add(hand.get(1));
+				straightHand.add(hand.get(0));
+				straightHand.add(hand.get(6));
+				//Hard coding A2345 straight
+				return true;
+			} else {
+				return false;
+			}
 		} else {
 			return false;
 		}
@@ -228,7 +249,7 @@ public class HandEvaluator {
 		// Ex 2 in a straight would be stored at index 0 and 6 at index 4
 	}
 
-	public static int hasFlush(ArrayList<Card> table, Player p1) {
+	public int hasFlush(ArrayList<Card> table, Player p1) {
 		ArrayList<Card> player = p1.getHand();
 		ArrayList<Card> allCards = new ArrayList<Card>();
 		allCards.addAll(player);
@@ -272,7 +293,7 @@ public class HandEvaluator {
 		}
 	}
 
-	public static void getFlushHand(int suit, ArrayList<Card> table, Player p1) {
+	public void getFlushHand(int suit, ArrayList<Card> table, Player p1) {
 		flushHand.clear();
 		ArrayList<Card> flushCards = new ArrayList<Card>();
 		for (Card c : table) {
@@ -291,7 +312,7 @@ public class HandEvaluator {
 		// Ex Ace in flush will be stored at index 0 and 2 at index 4
 	}
 
-	public static int hasFullHouse(ArrayList<Card> table, Player p1) {
+	public int hasFullHouse(ArrayList<Card> table, Player p1) {
 		ArrayList<Card> player = p1.getHand();
 		fiveCardHand.clear();
 		ArrayList<Card> allCards = new ArrayList<Card>();
@@ -355,7 +376,7 @@ public class HandEvaluator {
 		}
 	}
 
-	public static int hasFourOfAKind(ArrayList<Card> table, Player p1) {
+	public int hasFourOfAKind(ArrayList<Card> table, Player p1) {
 		ArrayList<Card> player = p1.getHand();
 		fiveCardHand.clear();
 		ArrayList<Card> allCards = new ArrayList<Card>();
@@ -395,7 +416,7 @@ public class HandEvaluator {
 		}
 	}
 
-	public static int hasStraightFlush(ArrayList<Card> table, Player p1) {
+	public int hasStraightFlush(ArrayList<Card> table, Player p1) {
 		if (hasFlush(table, p1) == FLUSH && hasStraight(table, p1) == STRAIGHT) {
 			if (flushHand.get(0).equals(straightHand.get(0)) && flushHand.get(1).equals(straightHand.get(1))
 					&& flushHand.get(2).equals(straightHand.get(2)) && flushHand.get(3).equals(straightHand.get(3))
@@ -409,15 +430,15 @@ public class HandEvaluator {
 		}
 	}
 
-	public static ArrayList<Card> getFlushHand() {
+	public ArrayList<Card> getFlushHand() {
 		return flushHand;
 	}
 
-	public static ArrayList<Card> getStraightHand() {
+	public ArrayList<Card> getStraightHand() {
 		return straightHand;
 	}
 
-	public static ArrayList<Card> getFiveCardHand() {
+	public ArrayList<Card> getFiveCardHand() {
 		return fiveCardHand;
 	}
 }
