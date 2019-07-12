@@ -1,9 +1,12 @@
+package poker;
+
+
 public class Card{
 	int rank;
 	int suit;
 	private final static String[] suitNames = {"s", "h", "c", "d"};
-	private final static String[] valueNames = {"Unused", "2", "3", "4", 
-		"5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
+	private final static String[] valueNames = {"Unused", "A", "2", "3", "4", 
+		"5", "6", "7", "8", "9", "10", "J", "Q", "K"};
 	public Card(int rank, int suit) {
 		this.suit = suit;
 		this.rank = rank;
@@ -18,21 +21,16 @@ public class Card{
 
 		String retValue;
 		retValue = suitNames[suit];
-		if (rank <= 9)
+		if (rank <= 10)
 			retValue += rank;
-		else if (rank == 10)
-			retValue += "j";
 		else if (rank == 11)
-			retValue += "q";
+			retValue += "j";
 		else if (rank == 12)
-			retValue += "k";
+			retValue += "q";
 		else if (rank == 13)
-			retValue += "1";
+			retValue += "k";
 		else 
 			retValue += "Unknown!";
 		return "images/" + retValue + ".gif";	
-	}
-	public String toString() {
-		return valueNames[rank] + " of " + suitNames[suit];
 	}
 }

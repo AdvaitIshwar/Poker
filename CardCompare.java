@@ -1,3 +1,5 @@
+package poker;
+
 import java.util.Comparator;
 
 public class CardCompare implements Comparator<Card>{

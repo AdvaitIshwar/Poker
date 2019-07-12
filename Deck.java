@@ -1,3 +1,5 @@
+package poker;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -10,14 +12,20 @@ public class Deck {
 			}
 		}
 	}
-	public void dealPlayers(ArrayList<Player> players) {
+	public void dealPlayers(Player[] players, int button) {
 		Collections.shuffle(deck);
-		for(int round=0; round<2; round++) {
-			for(int i=0; i<players.size(); i++) {
-				Player get = players.get(i);
-				get.add(deck.get(0));
-				deck.remove(0);
+		for (int round = 0; round < 2; round++) {
+			for (int i = button + 1; i != button; i++) {
+				if (i == players.length)
+					i = 0;
+				if (players[i] != null) {
+					players[i].add(deck.get(0));
+					deck.remove(0);
+				}
 			}
+			Player get = players[button];
+			get.add(deck.get(0));
+			deck.remove(0);
 		}
 	}
 	public ArrayList<Card> dealFlop() {

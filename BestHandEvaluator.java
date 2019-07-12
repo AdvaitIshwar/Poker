@@ -1,33 +1,38 @@
+package poker;
+
 import java.util.ArrayList;
 
 public class BestHandEvaluator {
 	int bestHand;
-	public BestHandEvaluator() {
+	int numPlayers;
+	public BestHandEvaluator(int numPlayers) {
+		this.numPlayers = numPlayers;
 		bestHand = HandEvaluator.NOTHING;
 	}
-	public ArrayList<Player> getBestHand(ArrayList<Player>players, ArrayList<Card>table) {
-		ArrayList<Player>winner = new ArrayList<Player>();
-		//Determines the best hand at the table
-		for(Player p: players) {
+
+	public Player getBestHand(ArrayList<Player> players, ArrayList<Card> table) {
+		ArrayList<Player> winner = new ArrayList<Player>();
+		// Determines the best hand at the table
+		for (Player p : players) {
 			int playerHand = bestHandHelper(p, table);
-			if(playerHand>=bestHand) {
+			if (playerHand >= bestHand) {
 				bestHand = playerHand;
 			}
 		}
-		//List of people with the best hand at the table
-		for(Player p:players) {
+		// List of people with the best hand at the table
+		for (Player p : players) {
 			int playerHand = bestHandHelper(p, table);
-			if(playerHand == bestHand) {
+			if (playerHand == bestHand) {
 				winner.add(p);
 			}
 		}
-		
-		//If more than one player has the best rank
-		if(winner.size()>1) {
-			return evaluateSameRank(winner, bestHand);
-		} else {
-			return winner;
+
+		// If more than one player has the best rank
+		if (winner.size() > 1) {
+			winner = evaluateSameRank(winner, bestHand);
 		}
+		return winner.get(0);
+
 	}
 	
 	//Works when comparing Flushes, Straights, StraightFlushes and nothing against each other
@@ -38,12 +43,12 @@ public class BestHandEvaluator {
 			for(int j=0; j<sameRank.size(); j++) {
 				if(i!=j) {
 					ArrayList<Card> playerOne = sameRank.get(i).getFiveCardHand();
-					ArrayList<Card> playerTwo = sameRank.get(j).getFiveCardHand();
+					ArrayList<Card> playerTwo = sameRank.get(i+1).getFiveCardHand();
 					for(int card=0; card<5; card++) {
 						if(playerOne.get(card).getValue() > playerTwo.get(card).getValue()) {
-							winnerCopy.remove(sameRank.get(j));
+							winnerCopy.remove(sameRank.get(i+1));
 						} else if(playerOne.get(card).getValue() < playerTwo.get(card).getValue()) {
-							winnerCopy.remove(sameRank.get(i));
+							winnerCopy.remove(sameRank.get(i+1));
 						} else {
 							continue;
 						}
@@ -63,17 +68,17 @@ public class BestHandEvaluator {
 			for(int j=0; j<sameRank.size(); j++) {
 				if(i!=j) {
 					ArrayList<Card> playerOne = sameRank.get(i).getFiveCardHand();
-					ArrayList<Card> playerTwo = sameRank.get(j).getFiveCardHand();
+					ArrayList<Card> playerTwo = sameRank.get(i+1).getFiveCardHand();
 					if(playerOne.get(0).getValue() == playerTwo.get(0).getValue()) {
 						if(playerOne.get(4).getValue() > playerTwo.get(4).getValue()) {
-							winnerCopy.remove(sameRank.get(j));
+							winnerCopy.remove(sameRank.get(i+1));
 						} else if(playerOne.get(4).getValue() < playerTwo.get(4).getValue()) {
 							winnerCopy.remove(sameRank.get(i));
 						} else {
 							continue;
 						}
 					} else if(playerOne.get(0).getValue() > playerTwo.get(0).getValue()) {
-						winnerCopy.remove(sameRank.get(j));
+						winnerCopy.remove(sameRank.get(i+1));
 					} else {
 						winnerCopy.remove(sameRank.get(i));
 					}
@@ -197,7 +202,7 @@ public class BestHandEvaluator {
 					if(playerOne.get(0).getValue() == playerTwo.get(0).getValue()) {
 						if(playerOne.get(2).getValue() == playerTwo.get(2).getValue()) {
 							if(playerOne.get(3).getValue() == playerTwo.get(3).getValue()) {
-								if(playerOne.get(4).getValue() == playerTwo.get(4).getValue()) {
+								if(playerOne.get(4).getValue() > playerTwo.get(4).getValue()) {
 									continue;
 								} else if(playerOne.get(4).getValue() > playerTwo.get(4).getValue()) {
 									winnerCopy.remove(sameRank.get(j));
@@ -250,33 +255,23 @@ public class BestHandEvaluator {
 	}
 	
 	public int bestHandHelper(Player player, ArrayList<Card>table) {
-		HandEvaluator eval = new HandEvaluator();
-		if(eval.hasStraightFlush(table, player)==HandEvaluator.STRAIGHTFLUSH) {
-			player.setRank("StraightFlush");
+		if(HandEvaluator.hasStraightFlush(table, player)==HandEvaluator.STRAIGHTFLUSH) {
 			return HandEvaluator.STRAIGHTFLUSH;
-		} else if(eval.hasFourOfAKind(table, player)==HandEvaluator.QUADS) {
-			player.setRank("Quads");
+		} else if(HandEvaluator.hasFourOfAKind(table, player)==HandEvaluator.QUADS) {
 			return HandEvaluator.QUADS;
-		} else if(eval.hasFullHouse(table, player)==HandEvaluator.FULLHOUSE) {
-			player.setRank("FullHouse");
+		} else if(HandEvaluator.hasFullHouse(table, player)==HandEvaluator.FULLHOUSE) {
 			return HandEvaluator.FULLHOUSE;
-		} else if(eval.hasFlush(table, player)==HandEvaluator.FLUSH) {
-			player.setRank("Flush");
+		} else if(HandEvaluator.hasFlush(table, player)==HandEvaluator.FLUSH) {
 			return HandEvaluator.FLUSH;
-		} else if(eval.hasStraight(table, player)==HandEvaluator.STRAIGHT) {
-			player.setRank("Straight");
+		} else if(HandEvaluator.hasStraight(table, player)==HandEvaluator.STRAIGHT) {
 			return HandEvaluator.STRAIGHT;
-		} else if(eval.hasThreeOfAKind(table, player)==HandEvaluator.SET) {
-			player.setRank("Set");
+		} else if(HandEvaluator.hasThreeOfAKind(table, player)==HandEvaluator.SET) {
 			return HandEvaluator.SET;
-		} else if(eval.hasTwoPair(table, player)==HandEvaluator.TWOPAIR) {
-			player.setRank("TwoPair");
+		} else if(HandEvaluator.hasTwoPair(table, player)==HandEvaluator.TWOPAIR) {
 			return HandEvaluator.TWOPAIR;
-		} else if(eval.hasPair(table, player)==HandEvaluator.PAIR) {
-			player.setRank("Pair");
+		} else if(HandEvaluator.hasPair(table, player)==HandEvaluator.PAIR) {
 			return HandEvaluator.PAIR;
 		} else {
-			player.setRank("Nothing");
 			return HandEvaluator.NOTHING;
 		}
 	}
